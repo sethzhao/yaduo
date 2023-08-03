@@ -1,0 +1,407 @@
+﻿<krpano version="1.19" title="Yaduo Tour">
+
+	<include url="skin/vtourskin.xml" />
+
+	<action name="hotspot_animate">
+		if(hotspot[%1].loaded,
+			tween(hotspot[%1].alpha, 0.0, 1.0, default, tween(hotspot[%1].alpha, 1.0, 1.0, default, hotspot_animate(%1) ) );
+		);
+	</action>
+
+	<!--
+		do_crop_animation(framewidth, frameheight, framerate)
+		- animation by changing the image cropping
+		- parameters:
+		  - framewidth - the width from one frame in pixels
+		  - frameheight - the height from one frame in pixels
+		  - framerate - the animation frame rate in 'frames per second'
+		- the image can be a vertical or horizontal (or both) image-strip / sprite-sheet
+		- the action will loop automatically through all frames from left to right and top to bottom
+	-->
+	<action name="do_crop_animation" scope="local" args="framewidth, frameheight, framerate">
+		<!-- define local variables -->
+		calc(local.xframes, (caller.imagewidth /framewidth) BOR 0);
+		calc(local.frames, xframes * ((caller.imageheight / frameheight) BOR 0));
+		def(local.frame, integer, 0);
+		def(local.lastStay, integer, 0);
+		
+		<!-- set the first frame -->
+		calc(caller.crop, '0|0|' + framewidth + '|' + frameheight);
+		
+		<!-- do the animation -->
+		setinterval(calc('crop_anim_' + caller.name), calc(1.0 / framerate),
+			if(caller.loaded,
+				inc(frame);
+				if(frame GE frames,
+					if(caller.onlastframe !== null, callwith(caller, onlastframe() ) );
+					inc(lastStay);
+					if(lastStay GE 13, set(frame,0);set(lastStay,0);, dec(frame));
+				);
+				mod(xpos, frame, xframes);
+				div(ypos, frame, xframes);
+				Math.floor(ypos);
+				mul(xpos, framewidth);
+				mul(ypos, frameheight);
+				calc(caller.crop, xpos + '|' + ypos + '|' + framewidth + '|' + frameheight);
+			  ,
+				<!-- stop the interval when the hotspot gets removed -->
+				clearinterval(calc('crop_anim_' + caller.name));
+			);
+		);
+	</action>
+
+	<!-- customize skin settings: maps, gyro, webvr, thumbnails, tooltips, layout, design, ... -->
+	<skin_settings maps="false"
+	               maps_type="google"
+	               maps_bing_api_key=""
+	               maps_google_api_key=""
+	               maps_zoombuttons="false"
+	               gyro="true"
+	               webvr="false"
+	               webvr_gyro_keeplookingdirection="false"
+	               webvr_prev_next_hotspots="true"
+	               littleplanetintro="false"
+	               title="false"
+	               thumbs="false"
+	               thumbs_width="120" thumbs_height="80" thumbs_padding="10" thumbs_crop="0|40|240|160"
+	               thumbs_opened="false"
+	               thumbs_text="false"
+	               thumbs_dragging="true"
+	               thumbs_onhoverscrolling="false"
+	               thumbs_scrollbuttons="false"
+	               thumbs_scrollindicator="false"
+	               thumbs_loop="false"
+	               tooltips_buttons="false"
+	               tooltips_thumbs="false"
+	               tooltips_hotspots="false"
+	               tooltips_mapspots="false"
+	               deeplinking="false"
+	               loadscene_flags="MERGE"
+	               loadscene_blend="OPENBLEND(0.5, 0.0, 0.75, 0.05, linear)"
+	               loadscene_blend_prev="SLIDEBLEND(0.5, 180, 0.75, linear)"
+	               loadscene_blend_next="SLIDEBLEND(0.5,   0, 0.75, linear)"
+	               loadingtext="loading..."
+	               layout_width="100%"
+	               layout_maxwidth="814"
+	               controlbar_width="-24"
+	               controlbar_height="40"
+	               controlbar_offset="20"
+	               controlbar_offset_closed="-40"
+	               controlbar_overlap.no-fractionalscaling="10"
+	               controlbar_overlap.fractionalscaling="0"
+	               design_skin_images="vtourskin.png"
+	               design_bgcolor="0x2D3E50"
+	               design_bgalpha="0.8"
+	               design_bgborder="0"
+	               design_bgroundedge="1"
+	               design_bgshadow="0 4 10 0x000000 0.3"
+	               design_thumbborder_bgborder="3 0xFFFFFF 1.0"
+	               design_thumbborder_padding="2"
+	               design_thumbborder_bgroundedge="0"
+	               design_text_css="color:#FFFFFF; font-family:Arial;"
+	               design_text_shadow="1"
+	               />
+
+	<!--
+	    For an alternative skin design either change the <skin_settings> values 
+	    from above or optionally include one of the predefined designs from below.
+	-->
+	<!-- <include url="skin/vtourskin_design_flat_light.xml"  /> -->
+	<!-- <include url="skin/vtourskin_design_glass.xml"       /> -->
+	<!-- <include url="skin/vtourskin_design_ultra_light.xml" /> -->
+	<!-- <include url="skin/vtourskin_design_117.xml"         /> -->
+	<!-- <include url="skin/vtourskin_design_117round.xml"    /> -->
+	<!-- <include url="skin/vtourskin_design_black.xml"       /> -->
+
+	<!-- startup action - load the first scene -->
+	<action name="startup" autorun="onstart">
+		if(startscene === null OR !scene[get(startscene)], copy(startscene,scene[0].name); );
+		loadscene(get(startscene), null, MERGE);
+		if(startactions !== null, startactions() );
+	</action>
+	
+	<scene name="scene_corridor" title="corridor" onstart="js(inCorridor())" thumburl="panos/corridor.tiles/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0" vlookat="0" fovtype="MFOV" fov="140.000" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/corridor.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/corridor.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+
+		<hotspot name="spot1" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot1, 100, smooth, true);
+										loadscene(scene_room-hp, null, MERGE, BLEND(1));
+										js(hp_in());
+			             "
+	         >
+		<point ath="-106.101304" atv="-16.791171" />
+		<point ath="-74.225827" atv="-16.831876" />
+		<point ath="-74.341135" atv="45.105549" />
+		<point ath="-105.68624" atv="44.891627" />
+	</hotspot>
+
+	<hotspot name="spot2" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot2, 100, smooth, true);
+										loadscene(scene_room-tx, null, MERGE, BLEND(1));
+										js(tx_in());
+			             "
+	         >
+		<point ath="74.39525" atv="-16.847462" />
+		<point ath="105.905976" atv="-16.749706" />
+		<point ath="105.945787" atv="44.877084" />
+		<point ath="74.344567" atv="44.734319" />
+	</hotspot>
+
+	<hotspot name="spot3" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot3, 60, smooth, true);
+										loadscene(scene_room-gk, null, MERGE, BLEND(1));
+										js(gk_in());
+			             "
+	         >
+		<point ath="27.383517" atv="-8.047081" />
+		<point ath="32.792337" atv="-9.385651" />
+		<point ath="34.25765" atv="-0.82852" />
+		<point ath="35.941587" atv="32.275474" />
+		<point ath="27.587145" atv="25.561965" />
+	</hotspot>
+
+	<hotspot name="spot4" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot4, 60, smooth, true);
+										loadscene(scene_room-td, null, MERGE, BLEND(1));
+										js(td_in());
+			             "
+	         >
+		<point ath="-32.494924" atv="-9.497706" />
+		<point ath="-27.136176" atv="-8.280022" />
+		<point ath="-27.402962" atv="26.144261" />
+		<point ath="-35.347071" atv="31.067058" />
+		<point ath="-34.31432" atv="3.290699" />
+	</hotspot>
+
+	<hotspot name="spot5" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot5, 60, smooth, true);
+										loadscene(scene_room-xp, null, MERGE, BLEND(1));
+										js(xp_in());
+			             "
+	         >
+		<point ath="-152.786641" atv="-8.199491" />
+		<point ath="-147.375065" atv="-9.708765" />
+		<point ath="-145.613017" atv="4.999459" />
+		<point ath="-144.401186" atv="31.661477" />
+		<point ath="-152.669584" atv="25.763058" />
+	</hotspot>
+
+	<hotspot name="spot6" fillalpha="0" borderalpha="0" 
+	         depth="1000"
+	         ishotspot="true"
+	         loader_alternative=""
+	         polyline="false"
+	         scaleflying="true"
+	         tx="0"
+	         ty="0"
+	         tz="0"
+					 onclick="
+										looktohotspot(spot6, 60, smooth, true);
+										loadscene(scene_room-rsj, null, MERGE, BLEND(1));
+										js(rsj_in());
+			             "
+	         >
+		<point ath="147.465236" atv="-9.778263" />
+		<point ath="152.481326" atv="-8.334096" />
+		<point ath="152.6781" atv="25.927482" />
+		<point ath="144.718786" atv="31.320029" />
+		<point ath="145.720871" atv="3.233567" />
+	</hotspot>
+
+	</scene>
+
+	<scene name="scene_room-gk" title="room-gk" onstart="" thumburl="panos/room-gk.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-gk-light-1" url="assets/gk/light-1.png" ath="154.56683" atv="5.715959" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(gk_openHotspot('1'))" />
+
+		<hotspot name="room-gk-light-2" url="assets/gk/light-2.png" ath="82.572822" atv="1.872286" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(gk_openHotspot('2'))" />
+
+		<hotspot name="room-gk-light-3" url="assets/gk/light-3.png" ath="-11.263486" atv="-6.438699" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(gk_openHotspot('3'))" />
+
+		<hotspot name="room-gk-light-4" url="assets/gk/light-4.png" ath="2.575074" atv="16.623495" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(gk_openHotspot('4'))" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-gk.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-gk.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="82.001" atv="7.168" linkedscene="scene_corridor" />
+
+	</scene>
+
+	<scene name="scene_room-hp" title="room-hp" onstart="" thumburl="panos/room-hp.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-hp-light-1" url="assets/hp/light-1.png" ath="-64.26665" atv="6.931228" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(hp_openHotspot('1'))" />
+
+		<hotspot name="room-hp-light-2" url="assets/hp/light-2.png" ath="109.747045" atv="11.247507" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(hp_openHotspot('2'))" />
+
+		<hotspot name="room-hp-light-3" url="assets/hp/light-3.png" ath="-45.332963" atv="9.628013" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(hp_openHotspot('3'))" />
+
+		<hotspot name="room-hp-light-4" url="assets/hp/light-4.png" ath="27.760362" atv="-38.67581" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(hp_openHotspot('4'))" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-hp.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-hp.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="94.411" atv="8.597" linkedscene="scene_corridor" />
+
+	</scene>
+
+	<scene name="scene_room-rsj" title="room-rsj" onstart="" thumburl="panos/room-rsj.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-rsj-light-1" url="assets/rsj/light-1.png" ath="-61.630915" atv="19.340491" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(rsj_openHotspot('1'))" />
+
+		<hotspot name="room-rsj-light-2" url="assets/rsj/light-2.png" ath="-21.843287" atv="15.527141" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(rsj_openHotspot('2'))" />
+
+		<hotspot name="room-rsj-light-3" url="assets/rsj/light-3.png" ath="93.191967" atv="10.944954" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(rsj_openHotspot('3'))" />
+
+		<hotspot name="room-rsj-light-4" url="assets/rsj/light-4.png" ath="33.16006" atv="17.481681" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(rsj_openHotspot('4'))" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-rsj.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-rsj.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="-117.689" atv="5.843" linkedscene="scene_corridor" />
+
+	</scene>
+
+	<scene name="scene_room-td" title="room-td" onstart="" thumburl="panos/room-td.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-td-light-by" url="assets/td/light-by.png" ath="-170.74" atv="-20.74" edge="lefttop" distorted="true" width="266" height="268" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('by'))"/>
+
+		<hotspot name="room-td-light-ss" url="assets/td/light-ss.png" ath="-97.5" atv="-16.2" edge="lefttop" distorted="true" width="263" height="289" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('ss'))"/>
+
+		<!-- <hotspot name="room-td-light-sy" url="assets/td/light-sy.png" ath="-9.8" atv="0.6" edge="lefttop" distorted="true" width="198" height="197" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('sy'))"/> -->
+
+		<!-- <hotspot name="room-td-light-sz" url="assets/td/light-sz.png" ath="-179.26" atv="-7.66" edge="lefttop" distorted="true" width="228" height="266" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('sz'))"/> -->
+
+		<hotspot name="room-td-light-sp" url="assets/td/light-sp.png" ath="-40.54" atv="0.38" edge="lefttop" distorted="true" width="249" height="232" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('sp'))"/>
+
+		<!-- <hotspot name="room-td-light-tc" url="assets/td/light-tc.png" ath="-114.7" atv="-35.5" edge="lefttop" distorted="true" width="262" height="257" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(td_openHotspot('tc'))"/> -->
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-td.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-td.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="52.661" atv="6.395" linkedscene="scene_corridor" />
+
+	</scene>
+
+	<scene name="scene_room-tx" title="room-tx" onstart="" thumburl="panos/room-tx.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-tx-tv" url="assets/tx/tv.png" onloaded="do_crop_animation(197,118, 5);" width="197" height="118" ath="-47.101607" atv="3.056325" distorted="true" zoom="true" enabled="false" />
+		
+		<hotspot name="room-tx-light-1" url="assets/tx/light-1.png" ath="-79.427346" atv="10.629443" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(tx_openHotspot('1'))" />
+
+		<hotspot name="room-tx-light-2" url="assets/tx/light-2.png" ath="-46.803454" atv="3.679365" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(tx_openHotspot('2'))" />
+
+		<hotspot name="room-tx-light-3" url="assets/tx/light-3.png" ath="158.469528" atv="-5.026256" width="400" height="400"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(tx_openHotspot('3'))" />
+
+		<hotspot name="room-tx-light-4" url="assets/tx/light-4.png" ath="-20.335697" atv="2.485013" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(tx_openHotspot('4'))" />
+
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-tx.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-tx.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="-98.782" atv="10.145" linkedscene="scene_corridor" />
+
+	</scene>
+
+	<scene name="scene_room-xp" title="room-xp" onstart="" thumburl="panos/room-xp.tiles/thumb.jpg" lat="" lng="" heading="">
+		<hotspot name="room-xp-light-1" url="assets/xp/light-1.png" ath="-78.559413" atv="5.629123" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(xp_openHotspot('1'))" />
+
+		<hotspot name="room-xp-light-2" url="assets/xp/light-2.png" ath="166.664789" atv="16.078924" width="400" height="400"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(xp_openHotspot('2'))" />
+
+		<hotspot name="room-xp-light-3" url="assets/xp/light-3.png" ath="-30.845218" atv="9.315052" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(xp_openHotspot('3'))" />
+
+		<hotspot name="room-xp-light-4" url="assets/xp/light-4.png" ath="67.111942" atv="-2.322237" width="300" height="300"  distorted="true" zoom="true" enabled="true" onloaded="hotspot_animate(get(name));" onclick="js(xp_openHotspot('4'))" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/room-xp.tiles/preview.jpg" />
+
+		<image type="CUBE" multires="true" tilesize="512">
+			<level tiledimagewidth="1024" tiledimageheight="1024">
+				<cube url="panos/room-xp.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
+		</image>
+		<hotspot name="spot1" style="skin_hotspotstyle" ath="-112.443" atv="10.635" linkedscene="scene_corridor" />
+
+	</scene>
+
+
+</krpano>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="x-ua-compatible" content="IE=edge" />
+	<meta content="telephone=no,email=no" name="format-detection">
+  <script>
+    !function () { var a = "@charset \"utf-8\";html{color:#000;background:#fff;overflow-y:scroll;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}html *{outline:0;-webkit-text-size-adjust:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}html,body{font-family:sans-serif}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td,hr,button,article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{margin:0;padding:0}input,select,textarea{font-size:100%}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}abbr,acronym{border:0;font-variant:normal}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:500}ol,ul{list-style:none}caption,th{text-align:left}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:500}q:before,q:after{content:''}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}a:hover{text-decoration:underline}ins,a{text-decoration:none}", b = document.createElement("style"); if (document.getElementsByTagName("head")[0].appendChild(b), b.styleSheet) b.styleSheet.disabled || (b.styleSheet.cssText = a); else try { b.innerHTML = a } catch (c) { b.innerText = a } }(); !function (a, b) { function c() { var b = f.getBoundingClientRect().width; var c = b / 10; f.style.fontSize = c + "px", k.rem = a.rem = c } var d, e = a.document, f = e.documentElement, g = e.querySelector('meta[name="viewport"]'), h = e.querySelector('meta[name="flexible"]'), i = 0, j = 0, k = b.flexible || (b.flexible = {}); if (g) { console.warn("将根据已有的meta标签来设置缩放比例"); var l = g.getAttribute("content").match(/initial\-scale=([\d\.]+)/); l && (j = parseFloat(l[1]), i = parseInt(1 / j)) } else if (h) { var m = h.getAttribute("content"); if (m) { var n = m.match(/initial\-dpr=([\d\.]+)/), o = m.match(/maximum\-dpr=([\d\.]+)/); n && (i = parseFloat(n[1]), j = parseFloat((1 / i).toFixed(2))), o && (i = parseFloat(o[1]), j = parseFloat((1 / i).toFixed(2))) } } if (!i && !j) { var p = (a.navigator.appVersion.match(/android/gi), a.navigator.appVersion.match(/iphone/gi)), q = a.devicePixelRatio; i = p ? q >= 3 && (!i || i >= 3) ? 3 : q >= 2 && (!i || i >= 2) ? 2 : 1 : 1, j = 1 / i } if (f.setAttribute("data-dpr", i), !g) if (g = e.createElement("meta"), g.setAttribute("name", "viewport"), g.setAttribute("content", "initial-scale=" + j + ", maximum-scale=" + j + ", minimum-scale=" + j + ", user-scalable=no"), f.firstElementChild) f.firstElementChild.appendChild(g); else { var r = e.createElement("div"); r.appendChild(g), e.write(r.innerHTML) } a.addEventListener("resize", function () { clearTimeout(d), d = setTimeout(c, 300) }, !1), a.addEventListener("pageshow", function (a) { a.persisted && (clearTimeout(d), d = setTimeout(c, 300)) }, !1), "complete" === e.readyState ? e.body.style.fontSize = 12 * i + "px" : e.addEventListener("DOMContentLoaded", function () { e.body.style.fontSize = 12 * i + "px" }, !1), c(), k.dpr = a.dpr = i, k.refreshRem = c, k.rem2px = function (a) { var b = parseFloat(a) * this.rem; return "string" == typeof a && a.match(/rem$/) && (b += "px"), b }, k.px2rem = function (a) { var b = parseFloat(a) / this.rem; return "string" == typeof a && a.match(/px$/) && (b += "rem"), b } }(window, window.lib || (window.lib = {}));
+	</script>
+  
+  <link rel="stylesheet" href="build/app-d094564802.min.css">
+  <title>亚朵奇妙夜</title>
+</head>
+<body>
+
+	<!-- loading -->
+  <div class="loadingLayout">
+		<div class="loadWrap">
+			<div class="count">0%</div>
+		</div>
+	</div>
+
+	<!-- spinner -->
+	<div class="spinnerLayout">
+		<svg class="spinner" viewBox="0 0 100 100">
+			<circle class="path" cx="50" cy="50" r="40" fill="none" stroke-width="10"></circle>
+		</svg>
+	</div>
+
+	<div class="orientLayer">
+		<p>请横屏体验</p>
+	</div>
+
+
+  <div class="startLayer">
+    <p>点击播放视频</p>
+  </div>
+
+  <audio id="bgm-c" preload="auto" loop src="assets/c.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-gk" preload="auto" loop src="assets/gk.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-rsj" preload="auto" loop src="assets/rsj.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-td" preload="auto" loop src="assets/td.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-tx" preload="auto" loop src="assets/tx.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-hp" preload="auto" loop src="assets/hp.mp3?v=2" style="display: none"></audio>
+  <audio id="bgm-xp" preload="auto" loop src="assets/xp.mp3?v=2" style="display: none"></audio>
+
+  <div class="page page-video">
+    <video id="video" class="video" x-webkit-airplay="true"  webkit-playsinline="true" playsinline="true" x5-video-player-type="h5" preload="auto" src="assets/v.mp4?v=4"></video>
+  </div>
+
+  <div id="pano" class="page page-pano"></div>
+  
+  <div class="room-td">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-by" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b" data-right="by"></div>
+        <div class="answer answer-c"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-sp" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a" data-right="sp"></div>
+        <div class="answer answer-b"></div>
+        <div class="answer answer-c"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-ss" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b"></div>
+        <div class="answer answer-c" data-right="ss"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-sy" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b"></div>
+        <div class="answer answer-c" data-right="sy"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-sz" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b"></div>
+        <div class="answer answer-c" data-right="sz"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-tc" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a" data-right="tc"></div>
+        <div class="answer answer-b"></div>
+        <div class="answer answer-c"></div>
+        <div class="answer answer-d"></div>
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+    <div class="last last-4" style="display: none"></div>
+    <div class="last last-5" style="display: none"></div>
+  </div>
+
+  <div class="room-gk">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-1" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a" data-right="1"></div>
+        <div class="answer answer-b"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-2" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b" data-right="2"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-3" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a"></div>
+        <div class="answer answer-b" data-right="3"></div>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-4" style="display: none">
+      <div class="modal-content">
+        <div class="answer answer-a" data-right="4"></div>
+        <div class="answer answer-b"></div>
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+  </div>
+
+  <div class="room-xp">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-1" data-hotspot="1" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-2" data-hotspot="2" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-3" data-hotspot="3" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-4" data-hotspot="4" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+  </div>
+
+  <div class="room-hp">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-1" data-hotspot="1" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-2" data-hotspot="2" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-3" data-hotspot="3" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-4" data-hotspot="4" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+  </div>
+
+  <div class="room-rsj">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-1" data-hotspot="1" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-2" data-hotspot="2" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-3" data-hotspot="3" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-4" data-hotspot="4" style="display: none">
+      <div class="modal-content">
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+  </div>
+
+  <div class="room-tx">
+    <div class="modal modal-start" style="display: none">
+      <div class="modal-content">
+        <button class="btn-start"></button>
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-1" data-hotspot="1" style="display: none">
+      <div class="modal-content">
+        <img class="cover" src="assets/tx/scratch.png" />
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-2" data-hotspot="2" style="display: none">
+      <div class="modal-content">
+        <img class="cover" src="assets/tx/scratch.png" />
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-3" data-hotspot="3" style="display: none">
+      <div class="modal-content">
+        <img class="cover" src="assets/tx/scratch.png" />
+      </div>
+    </div>
+    <div class="modal modal-hotspot modal-hotspot-4" data-hotspot="4" style="display: none">
+      <div class="modal-content">
+        <img class="cover" src="assets/tx/scratch.png" />
+      </div>
+    </div>
+    <div class="modal modal-lottery" style="display: none">
+      <div class="modal-content">
+        <div class="active"></div>
+        <div class="btn-lottery"></div>
+      </div>
+    </div>
+    <div class="modal modal-gift" style="display: none">
+      <div class="modal-content">
+        <button class="btn-book"></button>
+      </div>
+    </div>
+  
+    <div class="last last-1" style="display: none"></div>
+    <div class="last last-2" style="display: none"></div>
+    <div class="last last-3" style="display: none"></div>
+  </div>
+
+  <!-- <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script> -->
+  <script src="tour.js"></script>
+  <script src="build/vendor-8adf52777a.min.js"></script>
+  <script src="build/app-fe4dec21b2.min.js"></script>
+</body>
+</html>
